@@ -11,12 +11,12 @@
                 total:0,
                 records:1,
                 moreCondition:false,
+                inspectionPoint:false,
                 routeName:'',
                 conditions:{
                     routeName:'',
-inspectionName:'',
-remark:'',
-
+                    inspectionRouteId:'',
+                    seq:'',
                 }
             }
         },
@@ -28,6 +28,9 @@ remark:'',
             vc.on('inspectionRouteManage','listInspectionRoute',function(_param){
                   vc.component._listInspectionRoutes(DEFAULT_PAGE, DEFAULT_ROWS);
             });
+            vc.on('inspectionRouteManage','goBack',function(_param){
+                vc.component.inspectionRouteManageInfo.inspectionPoint = false;
+            });
              vc.on('pagination','page_event',function(_currentPage){
                 vc.component._listInspectionRoutes(_currentPage,DEFAULT_ROWS);
             });
@@ -37,6 +40,8 @@ remark:'',
 
                 vc.component.inspectionRouteManageInfo.conditions.page = _page;
                 vc.component.inspectionRouteManageInfo.conditions.row = _rows;
+                vc.component.inspectionRouteManageInfo.conditions.communityId = vc.getCurrentCommunity().communityId;
+
                 var param = {
                     params:vc.component.inspectionRouteManageInfo.conditions
                };
@@ -70,7 +75,10 @@ remark:'',
             },
             _queryInspectionRouteMethod:function(){
                 vc.component._listInspectionRoutes(DEFAULT_PAGE, DEFAULT_ROWS);
-
+            },
+            _openInspectionPointModel:function(_inspectionRoute){
+                vc.component.inspectionRouteManageInfo.inspectionPoint = true;
+                vc.emit('inspectionRoutePointManage','listInspectionPoint',_inspectionRoute);
             },
             _moreCondition:function(){
                 if(vc.component.inspectionRouteManageInfo.moreCondition){

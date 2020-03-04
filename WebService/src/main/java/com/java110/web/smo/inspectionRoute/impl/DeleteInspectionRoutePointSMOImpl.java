@@ -2,59 +2,55 @@ package com.java110.web.smo.inspectionRoute.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.java110.core.component.AbstractComponentSMO;
-import com.java110.utils.constant.ServiceConstant;
-import com.java110.utils.exception.SMOException;
-import com.java110.utils.util.Assert;
-import com.java110.utils.util.BeanConvertUtil;
 import com.java110.core.context.IPageData;
-import com.java110.entity.component.ComponentValidateResult;
-import com.java110.web.smo.inspectionRoute.IListInspectionRoutesSMO;
+import com.java110.utils.constant.ServiceConstant;
+import com.java110.utils.util.Assert;
+import com.java110.web.smo.inspectionRoute.IDeleteInspectionRoutePointSMO;
+import com.java110.web.smo.inspectionRoute.IDeleteInspectionRouteSMO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
-
 /**
- * 查询inspectionRoute服务类
+ * 添加小区服务实现类
+ * delete by wuxw 2019-06-30
  */
-@Service("listInspectionRoutesSMOImpl")
-public class ListInspectionRoutesSMOImpl extends AbstractComponentSMO implements IListInspectionRoutesSMO {
+@Service("deleteInspectionRoutePointSMOImpl")
+public class DeleteInspectionRoutePointSMOImpl extends AbstractComponentSMO implements IDeleteInspectionRoutePointSMO {
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Override
-    public ResponseEntity<String> listInspectionRoutes(IPageData pd) throws SMOException {
-        return businessProcess(pd);
-    }
-
-    @Override
     protected void validate(IPageData pd, JSONObject paramIn) {
 
-        super.validatePageInfo(pd);
+        //super.validatePageInfo(pd);
+
+        //Assert.hasKeyAndValue(paramIn, "xxx", "xxx");
+        Assert.hasKeyAndValue(paramIn, "irmRelId", "路线巡检点关系ID不能为空");
         Assert.hasKeyAndValue(paramIn, "communityId", "小区ID不能为空");
 
+
         //super.checkUserHasPrivilege(pd, restTemplate, PrivilegeCodeConstant.AGENT_HAS_LIST_INSPECTIONROUTE);
+
     }
 
     @Override
     protected ResponseEntity<String> doBusinessProcess(IPageData pd, JSONObject paramIn) {
-        ComponentValidateResult result = super.validateStoreStaffCommunityRelationship(pd, restTemplate);
+        ResponseEntity<String> responseEntity = null;
+        super.validateStoreStaffCommunityRelationship(pd, restTemplate);
 
-        Map paramMap = BeanConvertUtil.beanCovertMap(result);
-        paramIn.putAll(paramMap);
-
-        String apiUrl = ServiceConstant.SERVICE_API_URL + "/api/inspectionRoute.listInspectionRoutes" + mapToUrlParam(paramIn);
-
-
-        ResponseEntity<String> responseEntity = this.callCenterService(restTemplate, pd, "",
-                apiUrl,
-                HttpMethod.GET);
-
+        responseEntity = this.callCenterService(restTemplate, pd, paramIn.toJSONString(),
+                ServiceConstant.SERVICE_API_URL + "/api/inspectionRoute.deleteInspectionRoutePoint",
+                HttpMethod.POST);
         return responseEntity;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteInspectionRoutePoint(IPageData pd) {
+        return super.businessProcess(pd);
     }
 
     public RestTemplate getRestTemplate() {
